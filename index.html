@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BK AI Apps</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .app-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .app-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .app-card p {
+            color: #718096;
+            line-height: 1.6;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .app-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-subdomain {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .badge-embedded {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Elit Vitrin</h1>
+            <p>BK AI apps showcase</p>
+        </div>
+
+        <div class="apps-grid">
+            <!-- Nutrition App - Subdomain -->
+            <a href="https://nutrition.elitvitrin.com" class="app-card">
+                <span class="app-icon">🥗</span>
+                <h2>AI-Powered Nutrition App</h2>
+                <p>Track your daily nutrition, calories, and maintain a healthy lifestyle with personalized meal planning.</p>
+                <span class="app-badge badge-subdomain">Subdomain App</span>
+            </a>
+
+            <!-- Embedded Claude Artifact App -->
+            <a href="app2.html" class="app-card">
+                <span class="app-icon">✨</span>
+                <h2>AI-Powered Vocabulary</h2>
+                <p>Improve your vocabulary with the help of interactive application built with Claude AI.</p>
+                <span class="app-badge badge-embedded">Claude Powered</span>
+            </a>
+
+            <!-- Template for future apps -->
+            <!-- 
+            <a href="https://app3.elitvitrin.com" class="app-card">
+                <span class="app-icon">🎯</span>
+                <h2>App Name</h2>
+                <p>Description of your app and its main features.</p>
+                <span class="app-badge badge-subdomain">Subdomain App</span>
+            </a>
+            -->
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Elit Vitrin. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
