@@ -72,7 +72,15 @@
         // --- 2. SIMPLE SENTIMENT ANALYSIS ---
         // For a demo, we just look for keywords.
         const positiveWords = ['like', 'love', 'good', 'great', 'awesome', 'happy', 'wonderful', 'best', 'delicious', 'nice'];
-        const negativeWords = ['hate', 'bad', 'terrible', 'awful', 'sad', 'don\'t', 'can\'t', 'dislike', 'gross', 'stupid'];
+        const negativeWords = [
+            'hate', 'bad', 'terrible', 'awful', 'sad', 'dislike', 'gross', 'stupid',
+            'no', 'not', 'never', 'boring', 'angry', 'worst',
+            'don\'t', 'dont', 'do not',
+            'can\'t', 'cant', 'cannot',
+            'won\'t', 'wont', 'will not',
+            'isn\'t', 'isnt', 'is not',
+            'aren\'t', 'arent', 'are not'
+        ];
 
         function getSentiment(text) {
             let score = 0;
@@ -154,8 +162,8 @@
             x: canvas.width / 2,
             y: canvas.height / 2,
             size: ballSize,
-            dx: 4, // Ball speed X
-            dy: 4  // Ball speed Y
+            dx: 1, // Ball speed X
+            dy: 1  // Ball speed Y
         };
 
         function drawRect(x, y, w, h, color) {
@@ -204,9 +212,9 @@
         function moveComputer() {
             const paddleCenter = computer.y + computer.height / 2;
             if (paddleCenter < ball.y - 35) {
-                computer.y += 3; // AI speed
+                computer.y += 1.5; // AI speed
             } else if (paddleCenter > ball.y + 35) {
-                computer.y -= 3;
+                computer.y -= 1.5;
             }
         }
 
