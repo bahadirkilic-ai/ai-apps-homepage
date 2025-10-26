@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Pong</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #050505;
+            border: 2px solid #fff;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        #status {
+            font-size: 1.2em;
+            height: 50px;
+        }
+        #transcript {
+            color: #f0f;
+            font-weight: bold;
+        }
+        #sentiment {
+            color: #0ff;
+            font-weight: bold;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sentiment Pong 🗣️</h1>
+    <div id="status">
+        <p>Press START GAME and allow microphone access.</p>
+        <p>You said: <span id="transcript">...</span> | Sentiment: <span id="sentiment">...</span></p>
+    </div>
+    <button id="startButton">START GAME</button>
+    <br>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <script>
+        // --- 1. SETUP ---
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+        const transcriptEl = document.getElementById('transcript');
+        const sentimentEl = document.getElementById('sentiment');
+        const statusEl = document.getElementById('status');
+
+        let gameRunning = false;
+
+        // --- 2. SIMPLE SENTIMENT ANALYSIS ---
+        // For a demo, we just look for keywords.
+        const positiveWords = ['like', 'love', 'good', 'great', 'awesome', 'happy', 'wonderful', 'best', 'delicious', 'nice'];
+        const negativeWords = ['hate', 'bad', 'terrible', 'awful', 'sad', 'don\'t', 'can\'t', 'dislike', 'gross', 'stupid'];
+
+        function getSentiment(text) {
+            let score = 0;
+            const words = text.toLowerCase().split(' ');
+
+            words.forEach(word => {
+                if (positiveWords.includes(word)) {
+                    score++;
+                }
+                if (negativeWords.includes(word)) {
+                    score--;
+                }
+            });
+
+            transcriptEl.textContent = `"${text}"`;
+            if (score > 0) {
+                sentimentEl.textContent = "Positive (+)";
+                sentimentEl.style.color = "#0f0"; // Green
+                return 1; // Move Up
+            } else if (score < 0) {
+                sentimentEl.textContent = "Negative (-)";
+                sentimentEl.style.color = "#f00"; // Red
+                return -1; // Move Down
+            } else {
+                sentimentEl.textContent = "Neutral (0)";
+                sentimentEl.style.color = "#0ff"; // Cyan
+                return 0; // Don't move
+            }
+        }
+
+        // --- 3. SPEECH RECOGNITION ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            statusEl.innerHTML = "Sorry, your browser doesn't support Speech Recognition. Please try Google Chrome.";
+        }
+        
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true; // Keep listening
+        recognition.interimResults = false; // Get final results
+
+        recognition.onresult = (event) => {
+            const last = event.results.length - 1;
+            const text = event.results[last][0].transcript.trim();
+            
+            const sentiment = getSentiment(text);
+            movePaddle(player, sentiment);
+        };
+        
+        recognition.onend = () => {
+            if (gameRunning) {
+                recognition.start(); // Always restart listening if game is on
+            }
+        };
+
+        // --- 4. PONG GAME LOGIC ---
+        const paddleWidth = 15;
+        const paddleHeight = 100;
+        const ballSize = 10;
+        let paddleSpeed = 30; // How far a sentence moves the paddle
+
+        // Game objects
+        const player = {
+            x: 10,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            score: 0
+        };
+
+        const computer = {
+            x: canvas.width - 10 - paddleWidth,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            score: 0
+        };
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: ballSize,
+            dx: 4, // Ball speed X
+            dy: 4  // Ball speed Y
+        };
+
+        function drawRect(x, y, w, h, color) {
+            context.fillStyle = color;
+            context.fillRect(x, y, w, h);
+        }
+
+        function drawCircle(x, y, r, color) {
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(x, y, r, 0, Math.PI * 2, false);
+            context.closePath();
+            context.fill();
+        }
+
+        function drawText(text, x, y, color) {
+            context.fillStyle = color;
+            context.font = "45px 'Courier New'";
+            context.fillText(text, x, y);
+        }
+
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = -ball.dx; // Change direction
+            ball.dy = (Math.random() > 0.5 ? 1 : -1) * 4; // Random Y direction
+        }
+
+        function movePaddle(paddle, direction) {
+            if (direction === 1) { // Positive (UP)
+                paddle.y -= paddleSpeed;
+            } else if (direction === -1) { // Negative (DOWN)
+                paddle.y += paddleSpeed;
+            }
+
+            // Keep paddle within bounds
+            if (paddle.y < 0) {
+                paddle.y = 0;
+            }
+            if (paddle.y + paddle.height > canvas.height) {
+                paddle.y = canvas.height - paddle.height;
+            }
+        }
+
+        // Simple AI for the computer paddle
+        function moveComputer() {
+            const paddleCenter = computer.y + computer.height / 2;
+            if (paddleCenter < ball.y - 35) {
+                computer.y += 3; // AI speed
+            } else if (paddleCenter > ball.y + 35) {
+                computer.y -= 3;
+            }
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            // Move ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Ball collision (top/bottom walls)
+            if (ball.y + ball.size > canvas.height || ball.y - ball.size < 0) {
+                ball.dy = -ball.dy;
+            }
+
+            // Ball collision (paddles)
+            // Player
+            if (ball.x - ball.size < player.x + player.width &&
+                ball.y > player.y &&
+                ball.y < player.y + player.height) {
+                ball.dx = -ball.dx;
+            }
+            // Computer
+            if (ball.x + ball.size > computer.x &&
+                ball.y > computer.y &&
+                ball.y < computer.y + computer.height) {
+                ball.dx = -ball.dx;
+            }
+
+            // Scoring
+            if (ball.x - ball.size < 0) {
+                computer.score++;
+                resetBall();
+            } else if (ball.x + ball.size > canvas.width) {
+                player.score++;
+                resetBall();
+            }
+
+            // Move computer paddle
+            moveComputer();
+        }
+
+        function draw() {
+            // Clear canvas
+            drawRect(0, 0, canvas.width, canvas.height, '#050505');
+
+            // Draw net
+            for (let i = 0; i < canvas.height; i += 20) {
+                drawRect(canvas.width / 2 - 1, i, 2, 10, '#fff');
+            }
+
+            // Draw paddles
+            drawRect(player.x, player.y, player.width, player.height, '#fff');
+            drawRect(computer.x, computer.y, computer.width, computer.height, '#fff');
+
+            // Draw ball
+            drawCircle(ball.x, ball.y, ball.size, '#4CAF50');
+
+            // Draw scores
+            drawText(player.score, canvas.width / 4, 60, '#fff');
+            drawText(computer.score, 3 * canvas.width / 4, 60, '#fff');
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // --- 5. START BUTTON ---
+        startButton.addEventListener('click', () => {
+            if (gameRunning) return;
+            
+            try {
+                gameRunning = true;
+                startButton.style.display = 'none';
+                statusEl.innerHTML = `<p>Listening... Try saying "I like this" or "I hate losing".</p>
+                                     <p>You said: <span id="transcript">...</span> | Sentiment: <span id="sentiment">...</span></p>`;
+                // Re-bind elements after innerHTML overwrite
+                window.transcriptEl = document.getElementById('transcript');
+                window.sentimentEl = document.getElementById('sentiment');
+
+                recognition.start(); // Start listening
+                gameLoop(); // Start the game
+            } catch (e) {
+                statusEl.innerHTML = "Error starting speech recognition. Did you allow the microphone?";
+                console.error(e);
+            }
+        });
+
+    </script>
+</body>
+</html>
